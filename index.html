@@ -1,0 +1,43 @@
+<script>
+async function fetchRepoContents() {
+    const owner = 'osakin'; // あなたのGitHubユーザー名
+    const repo = 'StaticHTML'; // あなたのリポジトリ名
+    const url = `https://api.github.com/repos/${owner}/${repo}/contents/`;
+
+    try {
+        const response = await fetch(url);
+        const contents = await response.json();
+
+        const fileList = document.getElementById('file-list');
+        contents.forEach(item => {
+            // HTMLファイルやディレクトリのみを表示するなどのフィルターも可能
+            if (item.type === 'file' && item.name.endsWith('.html') && item.name !== 'index.html') {
+                const listItem = document.createElement('li');
+                const link = document.createElement('a');
+                link.href = `./${item.name}`; // GitHub Pagesの相対パス
+                link.textContent = item.name;
+                listItem.appendChild(link);
+                fileList.appendChild(listItem);
+            } else if (item.type === 'dir') {
+                 const listItem = document.createElement('li');
+                 const link = document.createElement('a');
+                 link.href = `./${item.name}/`;
+                 link.textContent = item.name + '/';
+                 listItem.appendChild(link);
+                 fileList.appendChild(listItem);
+            }
+        });
+    } catch (error) {
+        console.error('ファイルの取得に失敗しました:', error);
+        document.getElementById('file-list').innerHTML = '<li>ファイルの読み込み中にエラーが発生しました。</li>';
+    }
+}
+
+// ページが読み込まれたらリストを生成
+document.addEventListener('DOMContentLoaded', fetchRepoContents);
+</script>
+
+<h1>リポジトリのコンテンツ一覧 (動的)</h1>
+<ul id="file-list">
+    <li>読み込み中...</li>
+</ul>
