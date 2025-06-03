@@ -215,245 +215,281 @@
             どうでしたか？ マウスは、あなたのデジタルライフを豊かにする最高の相棒です。それぞれの操作がどんな魔法を生み出すのか、ぜひ好奇心を持って試してみてくださいね！ きっと、パソコンがもっともっと楽しくなりますよ！
         </p>
     </div>
-
     <script>
         // 1. クリックのデモンストレーション
         const clickButton = document.getElementById('click-button');
         const clickMessage = document.getElementById('click-message');
-        clickButton.addEventListener('click', () => {
-            clickMessage.textContent = 'クリックされました！素晴らしい！';
-            clickMessage.classList.remove('text-green-700');
-            clickMessage.classList.add('text-blue-700');
-            setTimeout(() => {
-                clickMessage.textContent = '';
-                clickMessage.classList.remove('text-blue-700');
-                clickMessage.classList.add('text-green-700');
-            }, 2000); // 2秒後にメッセージをクリアします
-        });
+        if (clickButton && clickMessage) { // 要素が存在するかチェック
+            clickButton.addEventListener('click', () => {
+                clickMessage.textContent = 'クリックされました！素晴らしい！';
+                clickMessage.classList.remove('text-green-700');
+                clickMessage.classList.add('text-blue-700');
+                setTimeout(() => {
+                    clickMessage.textContent = '';
+                    clickMessage.classList.remove('text-blue-700');
+                    clickMessage.classList.add('text-green-700');
+                }, 2000); // 2秒後にメッセージをクリアします
+            });
+        }
+
 
         // 2. ダブルクリックのデモンストレーション
         const doubleClickButton = document.getElementById('double-click-button');
         const doubleClickMessage = document.getElementById('double-click-message');
-        doubleClickButton.addEventListener('dblclick', () => {
-            doubleClickMessage.textContent = 'ダブルクリック成功！アプリが起動しました！';
-            doubleClickMessage.classList.remove('text-purple-700');
-            doubleClickMessage.classList.add('text-green-700');
-            setTimeout(() => {
-                doubleClickMessage.textContent = '';
-                doubleClickMessage.classList.remove('text-green-700');
-                doubleClickMessage.classList.add('text-purple-700');
-            }, 2000);
-        });
+        if (doubleClickButton && doubleClickMessage) {
+            doubleClickButton.addEventListener('dblclick', () => {
+                doubleClickMessage.textContent = 'ダブルクリック成功！アプリが起動しました！';
+                doubleClickMessage.classList.remove('text-purple-700');
+                doubleClickMessage.classList.add('text-green-700');
+                setTimeout(() => {
+                    doubleClickMessage.textContent = '';
+                    doubleClickMessage.classList.remove('text-green-700');
+                    doubleClickMessage.classList.add('text-purple-700');
+                }, 2000);
+            });
+        }
 
         // 3. 右クリックのデモンストレーション
         const rightClickButton = document.getElementById('right-click-button');
         const contextMenu = document.getElementById('context-menu');
-        const contextMenuItems = contextMenu.querySelectorAll('.context-menu-item');
-        const rightClickMessage = document.getElementById('right-click-message'); // 新しいメッセージ要素
+        const rightClickMessage = document.getElementById('right-click-message');
+        if (rightClickButton && contextMenu && rightClickMessage) {
+            const contextMenuItems = contextMenu.querySelectorAll('.context-menu-item');
 
-        // 右クリックイベントをリッスンします
-        rightClickButton.addEventListener('contextmenu', (e) => {
-            e.preventDefault(); // デフォルトのコンテキストメニュー表示を防止します
-            contextMenu.style.top = `${e.offsetY}px`; // クリック位置にメニューを表示
-            contextMenu.style.left = `${e.offsetX}px`;
-            contextMenu.classList.remove('hidden'); // メニューを表示します
-        });
+            // 右クリックイベントをリッスンします
+            rightClickButton.addEventListener('contextmenu', (e) => {
+                e.preventDefault(); // デフォルトのコンテキストメニュー表示を防止します
 
-        // ドキュメント全体でのクリックイベントをリッスンし、メニューを非表示にします
-        document.addEventListener('click', (e) => {
-            // クリックがコンテキストメニュー内ではない場合、メニューを非表示にします
-            if (!contextMenu.contains(e.target) && !rightClickButton.contains(e.target)) {
-                contextMenu.classList.add('hidden');
-            }
-        });
+                // クリックされた位置（ビューポート基準）
+                const clickX = e.clientX;
+                const clickY = e.clientY;
 
-        // コンテキストメニューアイテムのクリックイベント
-        contextMenuItems.forEach(item => {
-            item.addEventListener('click', () => {
-                const action = item.getAttribute('data-action');
-                rightClickMessage.textContent = `「${action}」が選択されました！`; // alertの代わりにメッセージを表示
-                rightClickMessage.classList.remove('text-blue-700');
-                rightClickMessage.classList.add('text-green-700');
-                setTimeout(() => {
-                    rightClickMessage.textContent = '';
-                    rightClickMessage.classList.remove('text-green-700');
-                    rightClickMessage.classList.add('text-blue-700');
-                }, 2000); // 2秒後にメッセージをクリアします
-                contextMenu.classList.add('hidden'); // メニューを非表示にします
+                // 親要素 (relativeを持つ要素) の位置とサイズを取得
+                // contextMenuは `<div class="relative ...">` の中にあります。
+                const parentContainer = rightClickButton.parentElement; // right-click-button の親要素
+                const parentRect = parentContainer.getBoundingClientRect();
+
+                // 親要素の左上を基準としたメニューの位置を計算
+                let menuX = clickX - parentRect.left;
+                let menuY = clickY - parentRect.top;
+
+                // メニューがビューポートからはみ出さないように調整（オプション）
+                // メニュー自体のサイズも考慮に入れるともっと正確になりますが、今回はシンプルに
+                // メニューが右端から画面外に出そうなら、左にずらす
+                if (clickX + contextMenu.offsetWidth > window.innerWidth) {
+                    menuX = clickX - parentRect.left - contextMenu.offsetWidth;
+                }
+                // メニューが下端から画面外に出そうなら、上にずらす
+                if (clickY + contextMenu.offsetHeight > window.innerHeight) {
+                    menuY = clickY - parentRect.top - contextMenu.offsetHeight;
+                }
+
+                contextMenu.style.top = `${menuY}px`;
+                contextMenu.style.left = `${menuX}px`;
+                contextMenu.classList.remove('hidden'); // メニューを表示します
             });
-        });
+
+            // ドキュメント全体でのクリックイベントをリッスンし、メニューを非表示にします
+            document.addEventListener('click', (e) => {
+                // クリックがコンテキストメニュー内でも、右クリックボタン内でもない場合、メニューを非表示にします
+                if (!contextMenu.contains(e.target) && !rightClickButton.contains(e.target)) {
+                    contextMenu.classList.add('hidden');
+                }
+            });
+
+            // コンテキストメニューアイテムのクリックイベント
+            contextMenuItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    const action = item.getAttribute('data-action');
+                    rightClickMessage.textContent = `「${action}」が選択されました！`; // alertの代わりにメッセージを表示
+                    rightClickMessage.classList.remove('text-blue-700');
+                    rightClickMessage.classList.add('text-green-700');
+                    setTimeout(() => {
+                        rightClickMessage.textContent = '';
+                        rightClickMessage.classList.remove('text-green-700');
+                        rightClickMessage.classList.add('text-blue-700');
+                    }, 2000); // 2秒後にメッセージをクリアします
+                    contextMenu.classList.add('hidden'); // メニューを非表示にします
+                });
+            });
+        }
 
         // 4. マウスオーバーのデモンストレーション
         const hoverArea = document.getElementById('hover-area');
         const tooltip = document.getElementById('tooltip');
+        if (hoverArea && tooltip) {
+            hoverArea.addEventListener('mouseenter', () => {
+                tooltip.classList.remove('hidden'); // ツールチップを表示します
+            });
 
-        hoverArea.addEventListener('mouseenter', () => {
-            tooltip.classList.remove('hidden'); // ツールチップを表示します
-        });
+            hoverArea.addEventListener('mouseleave', () => {
+                tooltip.classList.add('hidden'); // ツールチップを非表示にします
+            });
+        }
 
-        hoverArea.addEventListener('mouseleave', () => {
-            tooltip.classList.add('hidden'); // ツールチップを非表示にします
-        });
 
         // 5. ドラッグのデモンストレーション
         const draggableElement = document.getElementById('draggable-element');
         let isDragging = false;
         let offsetX, offsetY;
+        if (draggableElement) {
+            // マウスダウンイベント（ドラッグ開始）
+            draggableElement.addEventListener('mousedown', (e) => {
+                isDragging = true;
+                draggableElement.style.cursor = 'grabbing'; // カーソルを掴む形に変更
+                // 要素内のクリック位置からのオフセットを計算します
+                const rect = draggableElement.getBoundingClientRect();
+                offsetX = e.clientX - rect.left;
+                offsetY = e.clientY - rect.top;
+            });
 
-        // マウスダウンイベント（ドラッグ開始）
-        draggableElement.addEventListener('mousedown', (e) => {
-            isDragging = true;
-            draggableElement.style.cursor = 'grabbing'; // カーソルを掴む形に変更
-            // 要素内のクリック位置からのオフセットを計算します
-            offsetX = e.clientX - draggableElement.getBoundingClientRect().left;
-            offsetY = e.clientY - draggableElement.getBoundingClientRect().top;
-        });
+            // マウスムーブイベント（ドラッグ中）
+            document.addEventListener('mousemove', (e) => {
+                if (!isDragging) return;
 
-        // マウスムーブイベント（ドラッグ中）
-        document.addEventListener('mousemove', (e) => {
-            if (!isDragging) return;
+                // 親要素の境界内でドラッグを制限します
+                const parentRect = draggableElement.parentElement.getBoundingClientRect();
+                let newLeft = e.clientX - offsetX - parentRect.left;
+                let newTop = e.clientY - offsetY - parentRect.top;
 
-            // 親要素の境界内でドラッグを制限します
-            const parentRect = draggableElement.parentElement.getBoundingClientRect();
-            let newLeft = e.clientX - offsetX - parentRect.left;
-            let newTop = e.clientY - offsetY - parentRect.top;
+                // 境界チェック
+                newLeft = Math.max(0, Math.min(newLeft, parentRect.width - draggableElement.offsetWidth));
+                newTop = Math.max(0, Math.min(newTop, parentRect.height - draggableElement.offsetHeight));
 
-            // 境界チェック
-            newLeft = Math.max(0, Math.min(newLeft, parentRect.width - draggableElement.offsetWidth));
-            newTop = Math.max(0, Math.min(newTop, parentRect.height - draggableElement.offsetHeight));
+                draggableElement.style.left = `${newLeft}px`;
+                draggableElement.style.top = `${newTop}px`;
+            });
 
-            draggableElement.style.left = `${newLeft}px`;
-            draggableElement.style.top = `${newTop}px`;
-        });
+            // マウスアップイベント（ドラッグ終了）
+            document.addEventListener('mouseup', () => {
+                isDragging = false;
+                draggableElement.style.cursor = 'grab'; // カーソルを元に戻す
+            });
 
-        // マウスアップイベント（ドラッグ終了）
-        document.addEventListener('mouseup', () => {
-            isDragging = false;
-            draggableElement.style.cursor = 'grab'; // カーソルを元に戻す
-        });
+            // タッチイベントの追加 (ドラッグ)
+            draggableElement.addEventListener('touchstart', (e) => {
+                isDragging = true;
+                const touch = e.touches[0];
+                const rect = draggableElement.getBoundingClientRect();
+                offsetX = touch.clientX - rect.left;
+                offsetY = touch.clientY - rect.top;
+                e.preventDefault(); // スクロールを防ぐ
+            }, { passive: false }); // passive: false を追加
 
-        // タッチイベントの追加 (ドラッグ)
-        draggableElement.addEventListener('touchstart', (e) => {
-            isDragging = true;
-            const touch = e.touches[0];
-            offsetX = touch.clientX - draggableElement.getBoundingClientRect().left;
-            offsetY = touch.clientY - draggableElement.getBoundingClientRect().top;
-            e.preventDefault(); // スクロールを防ぐ
-        });
+            document.addEventListener('touchmove', (e) => {
+                if (!isDragging) return;
+                const touch = e.touches[0];
+                const parentRect = draggableElement.parentElement.getBoundingClientRect();
+                let newLeft = touch.clientX - offsetX - parentRect.left;
+                let newTop = touch.clientY - offsetY - parentRect.top;
 
-        document.addEventListener('touchmove', (e) => {
-            if (!isDragging) return;
-            const touch = e.touches[0];
-            const parentRect = draggableElement.parentElement.getBoundingClientRect();
-            let newLeft = touch.clientX - offsetX - parentRect.left;
-            let newTop = touch.clientY - offsetY - parentRect.top;
+                newLeft = Math.max(0, Math.min(newLeft, parentRect.width - draggableElement.offsetWidth));
+                newTop = Math.max(0, Math.min(newTop, parentRect.height - draggableElement.offsetHeight));
 
-            newLeft = Math.max(0, Math.min(newLeft, parentRect.width - draggableElement.offsetWidth));
-            newTop = Math.max(0, Math.min(newTop, parentRect.height - draggableElement.offsetHeight));
+                draggableElement.style.left = `${newLeft}px`;
+                draggableElement.style.top = `${newTop}px`;
+                e.preventDefault(); // スクロールを防ぐ
+            }, { passive: false }); // passive: false を追加
 
-            draggableElement.style.left = `${newLeft}px`;
-            draggableElement.style.top = `${newTop}px`;
-            e.preventDefault(); // スクロールを防ぐ
-        });
-
-        document.addEventListener('touchend', () => {
-            isDragging = false;
-        });
-
+            document.addEventListener('touchend', () => {
+                isDragging = false;
+            });
+        }
 
         // 6. ドラッグ＆ドロップのデモンストレーション
         const dragDropSource = document.getElementById('drag-drop-source');
         const dragDropTarget = document.getElementById('drag-drop-target');
+        if (dragDropSource && dragDropTarget) {
+            // ドラッグ可能要素のイベントリスナー
+            dragDropSource.addEventListener('dragstart', (e) => {
+                e.dataTransfer.setData('text/plain', 'dragged-item'); // ドロップ時に渡すデータを設定
+                dragDropSource.classList.add('opacity-50'); // ドラッグ中は半透明にする
+            });
 
-        // ドラッグ可能要素のイベントリスナー
-        dragDropSource.addEventListener('dragstart', (e) => {
-            e.dataTransfer.setData('text/plain', 'dragged-item'); // ドロップ時に渡すデータを設定
-            dragDropSource.classList.add('opacity-50'); // ドラッグ中は半透明にする
-        });
+            dragDropSource.addEventListener('dragend', () => {
+                dragDropSource.classList.remove('opacity-50'); // ドラッグ終了時に元に戻す
+            });
 
-        dragDropSource.addEventListener('dragend', () => {
-            dragDropSource.classList.remove('opacity-50'); // ドラッグ終了時に元に戻す
-        });
+            // ドロップターゲットのイベントリスナー
+            dragDropTarget.addEventListener('dragover', (e) => {
+                e.preventDefault(); // ドロップを許可するためにデフォルトの動作を防止
+                dragDropTarget.classList.add('border-indigo-700', 'bg-indigo-200'); // ドロップ可能であることを視覚的に示す
+            });
 
-        // ドロップターゲットのイベントリスナー
-        dragDropTarget.addEventListener('dragover', (e) => {
-            e.preventDefault(); // ドロップを許可するためにデフォルトの動作を防止
-            dragDropTarget.classList.add('border-indigo-700', 'bg-indigo-200'); // ドロップ可能であることを視覚的に示す
-        });
+            dragDropTarget.addEventListener('dragleave', () => {
+                dragDropTarget.classList.remove('border-indigo-700', 'bg-indigo-200'); // ドロップエリアから離れたら元に戻す
+            });
 
-        dragDropTarget.addEventListener('dragleave', () => {
-            dragDropTarget.classList.remove('border-indigo-700', 'bg-indigo-200'); // ドロップエリアから離れたら元に戻す
-        });
+            dragDropTarget.addEventListener('drop', (e) => {
+                e.preventDefault(); // デフォルトのドロップ動作を防止
+                const data = e.dataTransfer.getData('text/plain');
+                if (data === 'dragged-item') {
+                    dragDropTarget.textContent = 'ドロップ成功！';
+                    dragDropTarget.classList.remove('border-indigo-700', 'bg-indigo-200');
+                    dragDropTarget.classList.add('bg-indigo-500', 'text-white');
+                    dragDropSource.style.display = 'none'; // ソース要素を非表示にする
+                }
+            });
 
-        dragDropTarget.addEventListener('drop', (e) => {
-            e.preventDefault(); // デフォルトのドロップ動作を防止
-            const data = e.dataTransfer.getData('text/plain');
-            if (data === 'dragged-item') {
-                dragDropTarget.textContent = 'ドロップ成功！';
-                dragDropTarget.classList.remove('border-indigo-700', 'bg-indigo-200');
-                dragDropTarget.classList.add('bg-indigo-500', 'text-white');
-                dragDropSource.style.display = 'none'; // ソース要素を非表示にする
-            }
-        });
+            // タッチイベントの追加 (ドラッグ＆ドロップ)
+            let touchDragSource = null;
+            let touchOffsetX, touchOffsetY;
 
-        // タッチイベントの追加 (ドラッグ＆ドロップ)
-        let touchDragSource = null;
-        let touchOffsetX, touchOffsetY;
+            dragDropSource.addEventListener('touchstart', (e) => {
+                touchDragSource = dragDropSource;
+                const touch = e.touches[0];
+                const rect = dragDropSource.getBoundingClientRect();
+                touchOffsetX = touch.clientX - rect.left;
+                touchOffsetY = touch.clientY - rect.top;
+                dragDropSource.classList.add('opacity-50');
+                dragDropSource.style.position = 'absolute'; // ドラッグ中に位置を絶対指定にする
+                e.preventDefault();
+            }, { passive: false }); // passive: false を追加
 
-        dragDropSource.addEventListener('touchstart', (e) => {
-            touchDragSource = dragDropSource;
-            const touch = e.touches[0];
-            touchOffsetX = touch.clientX - dragDropSource.getBoundingClientRect().left;
-            touchOffsetY = touch.clientY - dragDropSource.getBoundingClientRect().top;
-            dragDropSource.classList.add('opacity-50');
-            dragDropSource.style.position = 'absolute'; // ドラッグ中に位置を絶対指定にする
-            e.preventDefault();
-        });
+            document.addEventListener('touchmove', (e) => {
+                if (!touchDragSource) return;
+                const touch = e.touches[0];
+                touchDragSource.style.left = `${touch.clientX - touchOffsetX}px`;
+                touchDragSource.style.top = `${touch.clientY - touchOffsetY}px`;
 
-        document.addEventListener('touchmove', (e) => {
-            if (!touchDragSource) return;
-            const touch = e.touches[0];
-            touchDragSource.style.left = `${touch.clientX - touchOffsetX}px`;
-            touchDragSource.style.top = `${touch.clientY - touchOffsetY}px`;
+                // ドロップターゲットとの交差をチェック
+                const targetRect = dragDropTarget.getBoundingClientRect();
+                const sourceRect = touchDragSource.getBoundingClientRect();
 
-            // ドロップターゲットとの交差をチェック
-            const targetRect = dragDropTarget.getBoundingClientRect();
-            const sourceRect = touchDragSource.getBoundingClientRect();
+                if (sourceRect.left < targetRect.right &&
+                    sourceRect.right > targetRect.left &&
+                    sourceRect.top < targetRect.bottom &&
+                    sourceRect.bottom > targetRect.top) {
+                    dragDropTarget.classList.add('border-indigo-700', 'bg-indigo-200');
+                } else {
+                    dragDropTarget.classList.remove('border-indigo-700', 'bg-indigo-200');
+                }
+                e.preventDefault();
+            }, { passive: false }); // passive: false を追加
 
-            if (sourceRect.left < targetRect.right &&
-                sourceRect.right > targetRect.left &&
-                sourceRect.top < targetRect.bottom &&
-                sourceRect.bottom > targetRect.top) {
-                dragDropTarget.classList.add('border-indigo-700', 'bg-indigo-200');
-            } else {
-                dragDropTarget.classList.remove('border-indigo-700', 'bg-indigo-200');
-            }
-            e.preventDefault();
-        });
+            document.addEventListener('touchend', () => {
+                if (!touchDragSource) return;
 
-        document.addEventListener('touchend', (e) => {
-            if (!touchDragSource) return;
+                const targetRect = dragDropTarget.getBoundingClientRect();
+                const sourceRect = touchDragSource.getBoundingClientRect();
 
-            const targetRect = dragDropTarget.getBoundingClientRect();
-            const sourceRect = touchDragSource.getBoundingClientRect();
-
-            if (sourceRect.left < targetRect.right &&
-                sourceRect.right > targetRect.left &&
-                sourceRect.top < targetRect.bottom &&
-                sourceRect.bottom > targetRect.top) {
-                // ドロップ成功
-                dragDropTarget.textContent = 'ドロップ成功！';
-                dragDropTarget.classList.remove('border-indigo-700', 'bg-indigo-200');
-                dragDropTarget.classList.add('bg-indigo-500', 'text-white');
-                touchDragSource.style.display = 'none';
-            } else {
-                // ドロップ失敗、元の位置に戻す（ここでは単純に非表示を解除）
-                touchDragSource.classList.remove('opacity-50');
-                touchDragSource.style.position = 'static'; // 元の位置に戻す
-            }
-            touchDragSource = null;
-        });
-
+                if (sourceRect.left < targetRect.right &&
+                    sourceRect.right > targetRect.left &&
+                    sourceRect.top < targetRect.bottom &&
+                    sourceRect.bottom > targetRect.top) {
+                    // ドロップ成功
+                    dragDropTarget.textContent = 'ドロップ成功！';
+                    dragDropTarget.classList.remove('border-indigo-700', 'bg-indigo-200');
+                    dragDropTarget.classList.add('bg-indigo-500', 'text-white');
+                    touchDragSource.style.display = 'none';
+                } else {
+                    // ドロップ失敗、元の位置に戻す（ここでは単純に非表示を解除）
+                    touchDragSource.classList.remove('opacity-50');
+                    touchDragSource.style.position = 'static'; // 元の位置に戻す
+                }
+                touchDragSource = null;
+            });
+        }
         // 7. スクロールはブラウザのネイティブ機能なのでJSでの操作は不要です。
         // ただし、カスタムスクロールバーのCSSは適用されています。
     </script>
