@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>マウス操作の基本インフォグラフィック</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Google FontsからInterフォントを読み込みます */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8; /* 背景色を設定します */
+            color: #334155; /* テキストのデフォルト色を設定します */
+        }
+        /* カスタムスクロールバーのスタイル */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #e2e8f0;
+            border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #94a3b8;
+            border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
+
+        /* コンテキストメニューのスタイル */
+        .context-menu {
+            position: absolute;
+            background-color: white;
+            border-radius: 0.5rem; /* rounded-lg */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* shadow-md */
+            z-index: 100;
+            min-width: 120px;
+            overflow: hidden; /* 角丸を適用するためにオーバーフローを隠します */
+        }
+        .context-menu-item {
+            padding: 0.5rem 1rem; /* py-2 px-4 */
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out;
+        }
+        .context-menu-item:hover {
+            background-color: #f1f5f9; /* hover:bg-slate-100 */
+        }
+        .context-menu-item:not(:last-child) {
+            border-bottom: 1px solid #e2e8f0; /* border-b border-slate-200 */
+        }
+    </style>
+</head>
+<body class="p-4 sm:p-8">
+    <div class="max-w-6xl mx-auto bg-white rounded-xl shadow-lg p-6 sm:p-10">
+        <h1 class="text-3xl sm:text-4xl font-bold text-center mb-8 text-blue-700">
+            マウス操作の基本：あなたのデジタルライフを彩る７つの筆使い
+        </h1>
+        <p class="text-center text-lg sm:text-xl text-slate-600 mb-12">
+            マウスは、まるでキャンバスに絵を描く筆のように、デジタル世界を自由自在に操るための道具です。この小さな「筆」を使いこなせば、あなたの想像力は無限に広がります。
+        </p>
+
+        <section class="mb-12 p-6 bg-blue-50 rounded-lg shadow-md">
+            <h2 class="text-2xl sm:text-3xl font-semibold text-blue-600 mb-4">
+                1. 「クリック」〜狙いを定めて、ズバッと一撃！〜
+            </h2>
+            <p class="text-slate-700 mb-4">
+                マウスの左ボタンを「カチッ」と1回押すことです。一番よく使う、まさに基本中の基本技！
+            </p>
+            <div class="flex flex-col items-center justify-center bg-white p-6 rounded-md shadow-inner">
+                <button id="click-button" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105">
+                    ここをクリック！
+                </button>
+                <p id="click-message" class="mt-4 text-lg text-green-700 font-medium"></p>
+            </div>
+        </section>
+
+        <section class="mb-12 p-6 bg-green-50 rounded-lg shadow-md">
+            <h2 class="text-2xl sm:text-3xl font-semibold text-green-600 mb-4">
+                2. 「ダブルクリック」〜素早くコンボ！秘めた力を解放！〜
+            </h2>
+            <p class="text-slate-700 mb-4">
+                左ボタンを「カチカチッ」と、素早く2回連続で押すことです。ちょっとしたスピード勝負！
+            </p>
+            <div class="flex flex-col items-center justify-center bg-white p-6 rounded-md shadow-inner">
+                <button id="double-click-button" class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105">
+                    ここをダブルクリック！
+                </button>
+                <p id="double-click-message" class="mt-4 text-lg text-purple-700 font-medium"></p>
+            </div>
+        </section>
+
+        <section class="mb-12 p-6 bg-purple-50 rounded-lg shadow-md">
+            <h2 class="text-2xl sm:text-3xl font-semibold text-purple-600 mb-4">
+                3. 「右クリック」〜奥義発動！隠された選択肢を呼び出せ！〜
+            </h2>
+            <p class="text-slate-700 mb-4">
+                マウスの右ボタンを「カチッ」と1回押すことです。これが、意外と知られていない魔法の呪文！
+            </p>
+            <div class="relative flex flex-col items-center justify-center bg-white p-6 rounded-md shadow-inner min-h-[150px]">
+                <button id="right-click-button" class="bg-purple-500 hover:bg-purple-600 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105">
+                    ここを右クリック！
+                </button>
+                <div id="context-menu" class="context-menu hidden">
+                    <div class="context-menu-item" data-action="copy">コピー</div>
+                    <div class="context-menu-item" data-action="paste">貼り付け</div>
+                    <div class="context-menu-item" data-action="rename">名前を変更</div>
+                </div>
+                <p id="right-click-message" class="mt-4 text-lg text-blue-700 font-medium"></p>
+            </div>
+        </section>
+
+        <section class="mb-12 p-6 bg-yellow-50 rounded-lg shadow-md">
+            <h2 class="text-2xl sm:text-3xl font-semibold text-yellow-600 mb-4">
+                4. 「マウスオーバー」〜そっと近づいて、耳を傾ける〜
+            </h2>
+            <p class="text-slate-700 mb-4">
+                クリックせずに、マウスカーソルを目的の場所に「そっと重ねる」だけです。まるで気配を察知する忍者！
+            </p>
+            <div class="flex flex-col items-center justify-center bg-white p-6 rounded-md shadow-inner">
+                <div id="hover-area" class="relative bg-yellow-500 w-48 h-24 rounded-lg flex items-center justify-center text-white font-bold text-lg cursor-pointer transition duration-300 ease-in-out transform hover:scale-105">
+                    ここにカーソルを合わせて！
+                    <div id="tooltip" class="absolute bottom-full mb-2 hidden bg-gray-800 text-white text-sm py-1 px-2 rounded-md shadow-lg whitespace-nowrap">
+                        これはヒントですよ！
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="mb-12 p-6 bg-red-50 rounded-lg shadow-md">
+            <h2 class="text-2xl sm:text-3xl font-semibold text-red-600 mb-4">
+                5. 「ドラッグ」〜ガッチリ掴んで、狙った場所へ！〜
+            </h2>
+            <p class="text-slate-700 mb-4">
+                左ボタンを「押したまま」、マウスを動かすことです。対象を「ガッチリ掴んで離さない！」イメージ。
+            </p>
+            <div class="relative flex items-center justify-center bg-white p-6 rounded-md shadow-inner h-64">
+                <div id="draggable-element" class="absolute bg-red-500 w-24 h-24 rounded-lg flex items-center justify-center text-white font-bold text-lg cursor-grab shadow-md" style="left: calc(50% - 48px); top: calc(50% - 48px);">
+                    ドラッグしてね
+                </div>
+            </div>
+        </section>
+
+        <section class="mb-12 p-6 bg-indigo-50 rounded-lg shadow-md">
+            <h2 class="text-2xl sm:text-3xl font-semibold text-indigo-600 mb-4">
+                6. 「ドラッグ＆ドロップ」〜掴んで、ポイッ！鮮やかな連携技！〜
+            </h2>
+            <p class="text-slate-700 mb-4">
+                「ドラッグ」で掴んだものを、目的の場所まで移動させて、そこで「パッ」とボタンを離すことです。掴んで捨てる、掴んで置く、といった一連の動作！
+            </p>
+            <div class="flex flex-col sm:flex-row items-center justify-center bg-white p-6 rounded-md shadow-inner gap-8 min-h-[200px]">
+                <div id="drag-drop-source" class="bg-indigo-500 w-32 h-32 rounded-lg flex items-center justify-center text-white font-bold text-lg cursor-grab shadow-md" draggable="true">
+                    これをドラッグ
+                </div>
+                <div id="drag-drop-target" class="border-4 border-dashed border-indigo-300 bg-indigo-100 w-48 h-32 rounded-lg flex items-center justify-center text-indigo-700 font-medium text-center transition-all duration-300 ease-in-out">
+                    ここにドロップ！
+                </div>
+            </div>
+        </section>
+
+        <section class="mb-12 p-6 bg-teal-50 rounded-lg shadow-md">
+            <h2 class="text-2xl sm:text-3xl font-semibold text-teal-600 mb-4">
+                7. 「スクロール」〜指先ひとつで、時間と空間を旅する〜
+            </h2>
+            <p class="text-slate-700 mb-4">
+                マウスの真ん中にある「くるくる回るホイールを回す」ことです。まるで巻物を巻き取るように！
+            </p>
+            <div class="bg-white p-6 rounded-md shadow-inner">
+                <div class="h-64 overflow-y-scroll border border-teal-300 rounded-lg p-4 custom-scrollbar">
+                    <p class="mb-2">
+                        長い文章やリストを読むときに、マウスのホイールを回すと画面が上下にスムーズに移動します。これは、ウェブサイトやドキュメント全体を見渡すのに非常に便利です。
+                    </p>
+                    <p class="mb-2">
+                        例えば、このテキストエリアのように、表示しきれないほどのコンテンツがある場合、スクロール機能が役立ちます。
+                    </p>
+                    <p class="mb-2">
+                        ホイールを上に回すと画面が上に、下に回すと画面が下に動きます。これにより、情報を効率的に閲覧できます。
+                    </p>
+                    <p class="mb-2">
+                        多くのアプリケーションやブラウザでこの機能がサポートされており、日常的なパソコン操作において欠かせないものです。
+                    </p>
+                    <p class="mb-2">
+                        長いブログ記事、ニュースフィード、ファイルリストなどを確認する際に、この操作を頻繁に使うことでしょう。
+                    </p>
+                    <p class="mb-2">
+                        指先一つで、まるで巻物を巻き取るように、情報の中を自由に旅することができます。
+                    </p>
+                    <p class="mb-2">
+                        このデモンストレーションエリアを上下にスクロールしてみてください。
+                    </p>
+                    <p class="mb-2">
+                        さらに多くのテキストを追加して、スクロールの必要性を強調します。
+                    </p>
+                    <p class="mb-2">
+                        これは、デジタルコンテンツを探索するための基本的なスキルの一つです。
+                    </p>
+                    <p class="mb-2">
+                        スクロールバーを直接ドラッグすることでも移動できますが、ホイールを使う方がより直感的で素早い操作が可能です。
+                    </p>
+                    <p class="mb-2">
+                        モバイルデバイスでは、指でスワイプする操作がこれに相当します。
+                    </p>
+                    <p class="mb-2">
+                        このインフォグラフィックの最後までスクロールして、すべてのマウス操作を体験してください。
+                    </p>
+                    <p class="mb-2">
+                        これで、マウス操作の基本は完璧ですね！
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <p class="text-center text-lg sm:text-xl text-slate-600 mt-12">
+            どうでしたか？ マウスは、あなたのデジタルライフを豊かにする最高の相棒です。それぞれの操作がどんな魔法を生み出すのか、ぜひ好奇心を持って試してみてくださいね！ きっと、パソコンがもっともっと楽しくなりますよ！
+        </p>
+    </div>
+
+    <script>
+        // 1. クリックのデモンストレーション
+        const clickButton = document.getElementById('click-button');
+        const clickMessage = document.getElementById('click-message');
+        clickButton.addEventListener('click', () => {
+            clickMessage.textContent = 'クリックされました！素晴らしい！';
+            clickMessage.classList.remove('text-green-700');
+            clickMessage.classList.add('text-blue-700');
+            setTimeout(() => {
+                clickMessage.textContent = '';
+                clickMessage.classList.remove('text-blue-700');
+                clickMessage.classList.add('text-green-700');
+            }, 2000); // 2秒後にメッセージをクリアします
+        });
+
+        // 2. ダブルクリックのデモンストレーション
+        const doubleClickButton = document.getElementById('double-click-button');
+        const doubleClickMessage = document.getElementById('double-click-message');
+        doubleClickButton.addEventListener('dblclick', () => {
+            doubleClickMessage.textContent = 'ダブルクリック成功！アプリが起動しました！';
+            doubleClickMessage.classList.remove('text-purple-700');
+            doubleClickMessage.classList.add('text-green-700');
+            setTimeout(() => {
+                doubleClickMessage.textContent = '';
+                doubleClickMessage.classList.remove('text-green-700');
+                doubleClickMessage.classList.add('text-purple-700');
+            }, 2000);
+        });
+
+        // 3. 右クリックのデモンストレーション
+        const rightClickButton = document.getElementById('right-click-button');
+        const contextMenu = document.getElementById('context-menu');
+        const contextMenuItems = contextMenu.querySelectorAll('.context-menu-item');
+        const rightClickMessage = document.getElementById('right-click-message'); // 新しいメッセージ要素
+
+        // 右クリックイベントをリッスンします
+        rightClickButton.addEventListener('contextmenu', (e) => {
+            e.preventDefault(); // デフォルトのコンテキストメニュー表示を防止します
+            contextMenu.style.top = `${e.offsetY}px`; // クリック位置にメニューを表示
+            contextMenu.style.left = `${e.offsetX}px`;
+            contextMenu.classList.remove('hidden'); // メニューを表示します
+        });
+
+        // ドキュメント全体でのクリックイベントをリッスンし、メニューを非表示にします
+        document.addEventListener('click', (e) => {
+            // クリックがコンテキストメニュー内ではない場合、メニューを非表示にします
+            if (!contextMenu.contains(e.target) && !rightClickButton.contains(e.target)) {
+                contextMenu.classList.add('hidden');
+            }
+        });
+
+        // コンテキストメニューアイテムのクリックイベント
+        contextMenuItems.forEach(item => {
+            item.addEventListener('click', () => {
+                const action = item.getAttribute('data-action');
+                rightClickMessage.textContent = `「${action}」が選択されました！`; // alertの代わりにメッセージを表示
+                rightClickMessage.classList.remove('text-blue-700');
+                rightClickMessage.classList.add('text-green-700');
+                setTimeout(() => {
+                    rightClickMessage.textContent = '';
+                    rightClickMessage.classList.remove('text-green-700');
+                    rightClickMessage.classList.add('text-blue-700');
+                }, 2000); // 2秒後にメッセージをクリアします
+                contextMenu.classList.add('hidden'); // メニューを非表示にします
+            });
+        });
+
+        // 4. マウスオーバーのデモンストレーション
+        const hoverArea = document.getElementById('hover-area');
+        const tooltip = document.getElementById('tooltip');
+
+        hoverArea.addEventListener('mouseenter', () => {
+            tooltip.classList.remove('hidden'); // ツールチップを表示します
+        });
+
+        hoverArea.addEventListener('mouseleave', () => {
+            tooltip.classList.add('hidden'); // ツールチップを非表示にします
+        });
+
+        // 5. ドラッグのデモンストレーション
+        const draggableElement = document.getElementById('draggable-element');
+        let isDragging = false;
+        let offsetX, offsetY;
+
+        // マウスダウンイベント（ドラッグ開始）
+        draggableElement.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            draggableElement.style.cursor = 'grabbing'; // カーソルを掴む形に変更
+            // 要素内のクリック位置からのオフセットを計算します
+            offsetX = e.clientX - draggableElement.getBoundingClientRect().left;
+            offsetY = e.clientY - draggableElement.getBoundingClientRect().top;
+        });
+
+        // マウスムーブイベント（ドラッグ中）
+        document.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+
+            // 親要素の境界内でドラッグを制限します
+            const parentRect = draggableElement.parentElement.getBoundingClientRect();
+            let newLeft = e.clientX - offsetX - parentRect.left;
+            let newTop = e.clientY - offsetY - parentRect.top;
+
+            // 境界チェック
+            newLeft = Math.max(0, Math.min(newLeft, parentRect.width - draggableElement.offsetWidth));
+            newTop = Math.max(0, Math.min(newTop, parentRect.height - draggableElement.offsetHeight));
+
+            draggableElement.style.left = `${newLeft}px`;
+            draggableElement.style.top = `${newTop}px`;
+        });
+
+        // マウスアップイベント（ドラッグ終了）
+        document.addEventListener('mouseup', () => {
+            isDragging = false;
+            draggableElement.style.cursor = 'grab'; // カーソルを元に戻す
+        });
+
+        // タッチイベントの追加 (ドラッグ)
+        draggableElement.addEventListener('touchstart', (e) => {
+            isDragging = true;
+            const touch = e.touches[0];
+            offsetX = touch.clientX - draggableElement.getBoundingClientRect().left;
+            offsetY = touch.clientY - draggableElement.getBoundingClientRect().top;
+            e.preventDefault(); // スクロールを防ぐ
+        });
+
+        document.addEventListener('touchmove', (e) => {
+            if (!isDragging) return;
+            const touch = e.touches[0];
+            const parentRect = draggableElement.parentElement.getBoundingClientRect();
+            let newLeft = touch.clientX - offsetX - parentRect.left;
+            let newTop = touch.clientY - offsetY - parentRect.top;
+
+            newLeft = Math.max(0, Math.min(newLeft, parentRect.width - draggableElement.offsetWidth));
+            newTop = Math.max(0, Math.min(newTop, parentRect.height - draggableElement.offsetHeight));
+
+            draggableElement.style.left = `${newLeft}px`;
+            draggableElement.style.top = `${newTop}px`;
+            e.preventDefault(); // スクロールを防ぐ
+        });
+
+        document.addEventListener('touchend', () => {
+            isDragging = false;
+        });
+
+
+        // 6. ドラッグ＆ドロップのデモンストレーション
+        const dragDropSource = document.getElementById('drag-drop-source');
+        const dragDropTarget = document.getElementById('drag-drop-target');
+
+        // ドラッグ可能要素のイベントリスナー
+        dragDropSource.addEventListener('dragstart', (e) => {
+            e.dataTransfer.setData('text/plain', 'dragged-item'); // ドロップ時に渡すデータを設定
+            dragDropSource.classList.add('opacity-50'); // ドラッグ中は半透明にする
+        });
+
+        dragDropSource.addEventListener('dragend', () => {
+            dragDropSource.classList.remove('opacity-50'); // ドラッグ終了時に元に戻す
+        });
+
+        // ドロップターゲットのイベントリスナー
+        dragDropTarget.addEventListener('dragover', (e) => {
+            e.preventDefault(); // ドロップを許可するためにデフォルトの動作を防止
+            dragDropTarget.classList.add('border-indigo-700', 'bg-indigo-200'); // ドロップ可能であることを視覚的に示す
+        });
+
+        dragDropTarget.addEventListener('dragleave', () => {
+            dragDropTarget.classList.remove('border-indigo-700', 'bg-indigo-200'); // ドロップエリアから離れたら元に戻す
+        });
+
+        dragDropTarget.addEventListener('drop', (e) => {
+            e.preventDefault(); // デフォルトのドロップ動作を防止
+            const data = e.dataTransfer.getData('text/plain');
+            if (data === 'dragged-item') {
+                dragDropTarget.textContent = 'ドロップ成功！';
+                dragDropTarget.classList.remove('border-indigo-700', 'bg-indigo-200');
+                dragDropTarget.classList.add('bg-indigo-500', 'text-white');
+                dragDropSource.style.display = 'none'; // ソース要素を非表示にする
+            }
+        });
+
+        // タッチイベントの追加 (ドラッグ＆ドロップ)
+        let touchDragSource = null;
+        let touchOffsetX, touchOffsetY;
+
+        dragDropSource.addEventListener('touchstart', (e) => {
+            touchDragSource = dragDropSource;
+            const touch = e.touches[0];
+            touchOffsetX = touch.clientX - dragDropSource.getBoundingClientRect().left;
+            touchOffsetY = touch.clientY - dragDropSource.getBoundingClientRect().top;
+            dragDropSource.classList.add('opacity-50');
+            dragDropSource.style.position = 'absolute'; // ドラッグ中に位置を絶対指定にする
+            e.preventDefault();
+        });
+
+        document.addEventListener('touchmove', (e) => {
+            if (!touchDragSource) return;
+            const touch = e.touches[0];
+            touchDragSource.style.left = `${touch.clientX - touchOffsetX}px`;
+            touchDragSource.style.top = `${touch.clientY - touchOffsetY}px`;
+
+            // ドロップターゲットとの交差をチェック
+            const targetRect = dragDropTarget.getBoundingClientRect();
+            const sourceRect = touchDragSource.getBoundingClientRect();
+
+            if (sourceRect.left < targetRect.right &&
+                sourceRect.right > targetRect.left &&
+                sourceRect.top < targetRect.bottom &&
+                sourceRect.bottom > targetRect.top) {
+                dragDropTarget.classList.add('border-indigo-700', 'bg-indigo-200');
+            } else {
+                dragDropTarget.classList.remove('border-indigo-700', 'bg-indigo-200');
+            }
+            e.preventDefault();
+        });
+
+        document.addEventListener('touchend', (e) => {
+            if (!touchDragSource) return;
+
+            const targetRect = dragDropTarget.getBoundingClientRect();
+            const sourceRect = touchDragSource.getBoundingClientRect();
+
+            if (sourceRect.left < targetRect.right &&
+                sourceRect.right > targetRect.left &&
+                sourceRect.top < targetRect.bottom &&
+                sourceRect.bottom > targetRect.top) {
+                // ドロップ成功
+                dragDropTarget.textContent = 'ドロップ成功！';
+                dragDropTarget.classList.remove('border-indigo-700', 'bg-indigo-200');
+                dragDropTarget.classList.add('bg-indigo-500', 'text-white');
+                touchDragSource.style.display = 'none';
+            } else {
+                // ドロップ失敗、元の位置に戻す（ここでは単純に非表示を解除）
+                touchDragSource.classList.remove('opacity-50');
+                touchDragSource.style.position = 'static'; // 元の位置に戻す
+            }
+            touchDragSource = null;
+        });
+
+        // 7. スクロールはブラウザのネイティブ機能なのでJSでの操作は不要です。
+        // ただし、カスタムスクロールバーのCSSは適用されています。
+    </script>
+</body>
+</html>
