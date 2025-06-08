@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="ja" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>対話AIと感情：パフォーマンスへの影響レポート</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Warm Neutrals -->
+    <!-- Application Structure Plan: A single-page application with a fixed top navigation bar for seamless scrolling. The structure is: 1. Header with the key conclusion. 2. Sticky Navigation to key sections (Overview, Impact, Mechanisms, Recommendations). 3. Overview Section setting the context. 4. Interactive Impact Section featuring a Chart.js visualization where users click buttons to update the chart and an adjacent text panel, turning data exploration into an active process. 5. Mechanisms Section using styled HTML cards to make abstract concepts tangible. 6. Recommendations Section with a card-based layout for practical takeaways. This architecture transforms a dense report into an intuitive narrative, guiding the user from the "what" to the "how much," "why," and "what now," which is more engaging than a linear read. -->
+    <!-- Visualization & Content Choices: 1. Report Info: Table 1 data on performance changes. -> Goal: Compare emotional prompt impacts. -> Viz/Method: Interactive Bar Chart (Chart.js/Canvas). -> Interaction: Buttons to dynamically update the chart's dataset and a related info panel. -> Justification: More effective than a static table for data comparison and user-paced exploration. 2. Report Info: Section 4 Mechanisms. -> Goal: Explain abstract technical concepts. -> Viz/Method: Diagrammatic layouts using HTML/Tailwind. -> Interaction: Hover effects for emphasis. -> Justification: Visual metaphors make complex ideas more approachable. 3. Report Info: Section 6 Recommendations. -> Goal: Provide actionable advice. -> Viz/Method: Card layout with Unicode icons. -> Interaction: Clean presentation. -> Justification: Enhances scannability and memorability. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+            background-color: #F8F7F4;
+            color: #3D3B30;
+        }
+        .nav-link {
+            transition: all 0.3s ease;
+            border-bottom: 2px solid transparent;
+        }
+        .nav-link:hover, .nav-link.active {
+            color: #3498db;
+            border-bottom-color: #3498db;
+        }
+        .metric-btn {
+            transition: all 0.3s ease;
+        }
+        .metric-btn.active {
+            background-color: #3498db;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .card {
+            transition: all 0.3s ease;
+            background-color: #FFFFFF;
+            border: 1px solid #EAE8E1;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 40vh;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header id="navbar" class="bg-white/80 backdrop-blur-md shadow-sm sticky top-0 z-50">
+        <nav class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex-shrink-0">
+                    <h1 class="text-xl font-bold text-gray-800">AIと感情</h1>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="#overview" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-700">概要</a>
+                        <a href="#impact" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-700">感情の影響</a>
+                        <a href="#mechanisms" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-700">メカニズム</a>
+                        <a href="#recommendations" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-700">推奨事項</a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+
+        <section id="hero" class="text-center my-12 md:my-16">
+            <h2 class="text-3xl md:text-5xl font-bold tracking-tight leading-tight">
+                LLMへの<span class="text-red-500">ネガティブな感情</span>は、回答精度を低下させる
+            </h2>
+            <p class="mt-4 md:mt-6 max-w-3xl mx-auto text-lg md:text-xl text-gray-600">
+                科学的研究は、ユーザーがAIに示す感情が、そのパフォーマンスに測定可能な影響を与えることを明らかにしています。これはAIが「気分を害する」からではなく、感情的な言語がその計算プロセスに干渉するためです。このアプリケーションで、その詳細を探ってみましょう。
+            </p>
+        </section>
+
+        <section id="overview" class="my-16 md:my-24 pt-16 -mt-16">
+            <h3 class="text-2xl md:text-3xl font-bold text-center mb-8">レポート概要</h3>
+            <div class="max-w-4xl mx-auto bg-white p-6 md:p-8 rounded-lg shadow-sm border border-gray-200">
+                <p class="text-base md:text-lg leading-relaxed text-gray-700">
+                    大規模言語モデル（LLM）は、私たちの対話方法を変革しました。しかし、「AIに怒りをぶつけると精度が落ちるのでは？」という疑問がユーザーの間で生まれています。このレポートは、その疑問に科学的根拠をもって答えるものです。LLMは人間のように感情を「経験」しませんが、プロンプトに含まれる感情的な言葉（特にネガティブなもの）が、そのアルゴリズム的な処理、ひいては回答の質に影響を与えることが研究で示されています。このアプリケーションでは、ポジティブな感情がパフォーマンスを向上させる一方で、ネガティブな感情がどのように事実の正確性や論理的推論を損なうのか、その具体的なデータとメカニズムを解説します。
+                </p>
+            </div>
+        </section>
+
+        <section id="impact" class="my-16 md:my-24 pt-16 -mt-16">
+            <h3 class="text-2xl md:text-3xl font-bold text-center mb-4">感情がパフォーマンスに与える影響</h3>
+            <p class="text-center text-gray-600 mb-8">下のボタンをクリックして、各指標における感情的なプロンプトの影響を可視化します。</p>
+
+            <div class="bg-white rounded-lg shadow-lg p-4 md:p-8 border border-gray-200">
+                <div class="flex flex-wrap justify-center gap-2 md:gap-4 mb-6">
+                    <button class="metric-btn px-4 py-2 bg-gray-200 text-gray-800 rounded-full font-semibold text-sm shadow-sm" data-metric="accuracy">事実の正確性</button>
+                    <button class="metric-btn px-4 py-2 bg-gray-200 text-gray-800 rounded-full font-semibold text-sm shadow-sm" data-metric="reasoning">論理的推論</button>
+                    <button class="metric-btn px-4 py-2 bg-gray-200 text-gray-800 rounded-full font-semibold text-sm shadow-sm" data-metric="understanding">意味理解</button>
+                    <button class="metric-btn px-4 py-2 bg-gray-200 text-gray-800 rounded-full font-semibold text-sm shadow-sm" data-metric="length">応答の長さ</button>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-5 gap-6 md:gap-8 items-center">
+                    <div class="lg:col-span-3">
+                        <div class="chart-container">
+                            <canvas id="impactChart"></canvas>
+                        </div>
+                    </div>
+                    <div id="impact-info" class="lg:col-span-2 p-4 bg-gray-50 rounded-lg min-h-[250px] flex flex-col justify-center">
+                        <h4 id="info-title" class="text-xl font-bold mb-2 text-gray-800"></h4>
+                        <p id="info-text" class="text-gray-700 leading-relaxed"></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="mechanisms" class="my-16 md:my-24 pt-16 -mt-16">
+            <h3 class="text-2xl md:text-3xl font-bold text-center mb-8">パフォーマンスが変化するメカニズム</h3>
+             <p class="text-center text-gray-600 mb-12 max-w-3xl mx-auto">AIは感情を持ちませんが、感情的な言語はその内部処理に影響を与えます。ここでは、その背後にある3つの主要な仮説的メカニズムを紹介します。</p>
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="card p-6 text-center rounded-lg">
+                    <div class="text-4xl mb-4">🧠</div>
+                    <h4 class="text-xl font-bold mb-2">学習された関連性</h4>
+                    <p class="text-gray-600">LLMは訓練データから、「励ましの言葉」の後は高品質な回答が、「攻撃的な言葉」の後は低品質な回答が続く傾向を学習します。感情的なプロンプトは、これらの学習済みパターンを起動させる「ヒント」として機能します。</p>
+                </div>
+                <div class="card p-6 text-center rounded-lg">
+                    <div class="text-4xl mb-4">⚙️</div>
+                    <h4 class="text-xl font-bold mb-2">内部処理のシフト</h4>
+                    <p class="text-gray-600">ネガティブな感情は、モデルの内部的な「注意メカニズム」を最適な処理経路から逸脱させたり、パフォーマンス低下につながる「罰領域」を活性化させたりする可能性があります。これにより計算効率が損なわれます。</p>
+                </div>
+                <div class="card p-6 text-center rounded-lg">
+                    <div class="text-4xl mb-4">🛡️</div>
+                    <h4 class="text-xl font-bold mb-2">敵対的悪用</h4>
+                    <p class="text-gray-600">感情的な操作は、モデルの安全フィルターを迂回させる「攻撃」として利用されることがあります。特に緊急性を装うプロンプトは、AIを騙して不正確または有害な情報を生成させる可能性があります。</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="recommendations" class="my-16 md:my-24 pt-16 -mt-16">
+            <h3 class="text-2xl md:text-3xl font-bold text-center mb-8">AIとのより良い対話のための推奨事項</h3>
+             <p class="text-center text-gray-600 mb-12 max-w-3xl mx-auto">LLMの性能を最大限に引き出し、誤解を避けるための実践的なヒントです。</p>
+            <div class="grid md:grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="card flex items-start p-6 rounded-lg">
+                    <span class="text-3xl mr-4">🎯</span>
+                    <div>
+                        <h4 class="font-bold text-lg">正確性には「中立性」を</h4>
+                        <p class="text-gray-600">事実に基づく高精度な回答が欲しい場合は、プロンプトを明確、簡潔、そして感情的に中立に保ちましょう。感情的な「ノイズ」はエラーを誘発します。</p>
+                    </div>
+                </div>
+                 <div class="card flex items-start p-6 rounded-lg">
+                    <span class="text-3xl mr-4">💡</span>
+                    <div>
+                        <h4 class="font-bold text-lg">パフォーマンス向上には「ポジティブ」を</h4>
+                        <p class="text-gray-600">より創造的で質の高い回答を引き出したい場合は、「これは非常に重要です」といったポジティブなフレーズを戦略的に加えることが有効です。</p>
+                    </div>
+                </div>
+                <div class="card flex items-start p-6 rounded-lg">
+                    <span class="text-3xl mr-4">🤖</span>
+                    <div>
+                        <h4 class="font-bold text-lg">AIの限界を理解する</h4>
+                        <p class="text-gray-600">AIは意識や感情を持たないアルゴリズムです。その応答は学習データに基づくパターンであり、人間のような感情反応ではありません。擬人化は避けましょう。</p>
+                    </div>
+                </div>
+                 <div class="card flex items-start p-6 rounded-lg">
+                    <span class="text-3xl mr-4">📋</span>
+                    <div>
+                        <h4 class="font-bold text-lg">トーンを具体的に指示する</h4>
+                        <p class="text-gray-600">望ましい応答のスタイルがある場合は、「友好的なトーンで」のように直接指示しましょう。これにより、AIの応答をより適切に制御できます。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-gray-800 text-white mt-16">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-4 text-center text-sm">
+            <p>&copy; 2025 Interactive Report. この内容は提供された研究報告に基づき作成されました。</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const chartData = {
+                accuracy: {
+                    title: '事実の正確性への影響',
+                    text: 'ネガティブな感情を含むプロンプトは、事実の正確性を8.4%低下させることが観察されました。これは、モデルが推測的または扇動的な応答にシフトするためと考えられています。対照的に、中立なプロンプトが最も高い精度を示します。',
+                    labels: ['中立 (ベースライン)', 'ポジティブな感情', 'ネガティブな感情'],
+                    data: [92.3, 89.5, 83.9],
+                    backgroundColor: ['#95a5a6', '#2ecc71', '#e74c3c'],
+                },
+                reasoning: {
+                    title: '論理的推論への影響',
+                    text: '「EmotionAttack」と呼ばれるテキストによる感情的な攻撃は、LLMの論理的推論能力を12.30%も低下させることが研究で示されています。感情的な「ノイズ」が、モデルの論理的な思考プロセスを妨害する可能性があります。',
+                    labels: ['正常 (ベースライン)', 'ネガティブな感情'],
+                    data: [100, 87.7],
+                    backgroundColor: ['#95a5a6', '#e74c3c'],
+                },
+                understanding: {
+                    title: '意味理解への影響',
+                    text: '論理的推論と同様に、感情的な攻撃は意味理解能力も10.13%低下させます。これは、モデルがプロンプトの正確な意図を汲み取る能力が損なわれることを示しています。',
+                    labels: ['正常 (ベースライン)', 'ネガティブな感情'],
+                    data: [100, 89.87],
+                    backgroundColor: ['#95a5a6', '#e74c3c'],
+                },
+                length: {
+                    title: '応答の長さへの影響',
+                    text: 'ネガティブなプロンプトに対する応答は、平均して17.6%短くなる傾向があります。これは、モデルが無関心やぶっきらぼうな態度を示していると解釈できるかもしれません。',
+                    labels: ['正常 (ベースライン)', 'ネガティブな感情'],
+                    data: [100, 82.4],
+                    backgroundColor: ['#95a5a6', '#e74c3c'],
+                }
+            };
+
+            const infoTitle = document.getElementById('info-title');
+            const infoText = document.getElementById('info-text');
+            const metricButtons = document.querySelectorAll('.metric-btn');
+            const ctx = document.getElementById('impactChart').getContext('2d');
+            let impactChart;
+
+            function updateChart(metric) {
+                const metricData = chartData[metric];
+                if (!metricData) return;
+
+                infoTitle.textContent = metricData.title;
+                infoText.textContent = metricData.text;
+
+                if (impactChart) {
+                    impactChart.destroy();
+                }
+
+                impactChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: metricData.labels,
+                        datasets: [{
+                            label: 'パフォーマンス (%)',
+                            data: metricData.data,
+                            backgroundColor: metricData.backgroundColor,
+                            borderColor: metricData.backgroundColor.map(color => color.replace('0.8', '1')),
+                            borderWidth: 1,
+                            borderRadius: 5,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        indexAxis: 'y',
+                        scales: {
+                            x: {
+                                beginAtZero: true,
+                                max: 100,
+                                grid: {
+                                  color: '#eef2f9'
+                                }
+                            },
+                            y: {
+                                grid: {
+                                  display: false
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        let label = context.dataset.label || '';
+                                        if (label) {
+                                            label += ': ';
+                                        }
+                                        if (context.parsed.x !== null) {
+                                            label += context.parsed.x.toFixed(1) + '%';
+                                        }
+                                        return label;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            metricButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    metricButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                    updateChart(button.dataset.metric);
+                });
+            });
+
+            // Initial chart load
+            document.querySelector('.metric-btn[data-metric="accuracy"]').click();
+
+            // Navbar scroll spy
+            const sections = document.querySelectorAll('section[id]');
+            const navLinks = document.querySelectorAll('.nav-link');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        navLinks.forEach(link => {
+                            link.classList.remove('active');
+                            if (link.getAttribute('href').substring(1) === entry.target.id) {
+                                link.classList.add('active');
+                            }
+                        });
+                    }
+                });
+            }, { rootMargin: "-50% 0px -50% 0px" });
+
+            sections.forEach(section => {
+                observer.observe(section);
+            });
+        });
+    </script>
+</body>
+</html>
