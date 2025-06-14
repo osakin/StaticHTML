@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>インフォグラフィック：ChatGPTとNotebookLMで“自分だけの記事”をつくる方法</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+            background-color: #F7F9FB;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        .flow-step {
+            border-color: #118AB2;
+            background-color: white;
+            color: #073B4C;
+        }
+        .flow-arrow::after {
+            content: '▼';
+            position: absolute;
+            bottom: -28px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 24px;
+            color: #FFD166;
+        }
+        .flow-connector::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2px;
+            height: 2rem;
+            background-color: #FFD166;
+        }
+        .card {
+            background-color: white;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -2px rgb(0 0 0 / 0.1);
+        }
+        h1, h2, h3 {
+            color: #073B4C;
+        }
+        .text-main { color: #073B4C; }
+        .text-accent { color: #118AB2; }
+        .bg-accent-light { background-color: #e7f3f8; }
+        .highlight-red { color: #FF6B6B; }
+        .highlight-green { color: #06D6A0; }
+        .highlight-yellow { color: #FFD166; }
+        .highlight-blue { color: #118AB2; }
+    </style>
+</head>
+<body class="text-main">
+
+    <div class="container mx-auto p-4 md:p-8 max-w-5xl">
+        <header class="text-center mb-12">
+            <h1 class="text-3xl md:text-5xl font-bold mb-2">ChatGPT & NotebookLM</h1>
+            <h2 class="text-xl md:text-2xl font-semibold text-accent">“自分だけの記事”をつくる新常識</h2>
+            <p class="mt-4 text-gray-600 max-w-3xl mx-auto">AIが生成したありきたりなコンテンツから脱却し、あなたの経験と視点を加えた、真に価値ある記事を作成するための実践的ガイドです。</p>
+        </header>
+
+        <main class="space-y-16">
+            <section id="problem">
+                <div class="card p-6 md:p-8">
+                    <h3 class="text-2xl font-bold text-center mb-2">ChatGPTで書いた文章、<br class="md:hidden"/>なんか“ペラい”と感じませんか？</h3>
+                    <p class="text-center text-gray-600 mb-6">多くの人が感じている、生成AIコンテンツの課題。その原因は明確です。</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                        <div class="chart-container">
+                            <canvas id="problemChart"></canvas>
+                        </div>
+                        <div>
+                            <h4 class="text-xl font-bold mb-3 text-accent">なぜ“ペラい”のか？</h4>
+                            <p class="mb-4">ChatGPTは非常に便利ですが、その知識は広大なインターネット上の一般情報に基づいています。そのため、どうしても「どこかで見たような内容」になりがちです。</p>
+                            <div class="bg-accent-light p-4 rounded-lg">
+                                <p class="font-bold text-lg highlight-red">根本的な原因：<br/>AIは“あなたの経験”を知らないから。</p>
+                                <p class="mt-2 text-sm">あなたのユニークな視点、具体的な失敗談、顧客との対話から得た気づき。これら「一次情報」がなければ、文章に深みは生まれません。</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="solution">
+                <div class="card p-6 md:p-8">
+                    <h3 class="text-2xl font-bold text-center mb-6">差がつくのは「あなたの一次情報」</h3>
+                    <p class="text-center text-gray-600 mb-8">誰でもAIを使える時代だからこそ、あなたの中に眠る情報が最も価値のある資産になります。</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div class="p-6 rounded-lg border-2 border-dashed border-gray-300">
+                            <h4 class="font-bold text-lg text-center mb-3">一般的なAI (ChatGPT)</h4>
+                            <p class="text-sm text-center">世の中の公開情報を<br/>広くまとめるのが得意</p>
+                            <p class="text-5xl text-center mt-4">🌍</p>
+                        </div>
+                        <div class="p-6 rounded-lg border-2 border-solid border-highlight-green bg-green-50">
+                            <h4 class="font-bold text-lg text-center mb-3">あなたの一次情報</h4>
+                            <p class="text-sm text-center">あなたしか知らない<br/>経験や知識の宝庫</p>
+                             <p class="text-5xl text-center mt-4">👤</p>
+                        </div>
+                    </div>
+                    <div class="mt-8 bg-gray-50 p-4 rounded-lg">
+                        <h4 class="font-bold text-center">一次情報の例</h4>
+                        <p class="text-center text-sm text-gray-600 mt-2">使用メモ・比較時の気づき・SNSでの反応・失敗談・読者の感想など</p>
+                    </div>
+                </div>
+            </section>
+            
+            <section id="tool-intro">
+                <div class="card p-6 md:p-8 text-center">
+                    <h3 class="text-2xl font-bold mb-4">そこで登場するのが <span class="highlight-blue">NotebookLM</span></h3>
+                    <p class="text-gray-600 mb-6">NotebookLMは、あなたの「一次情報」を理解し、活用してくれる、まさに“あなたのためのAI”です。</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                        <div class="bg-accent-light p-4 rounded-lg">
+                            <p class="text-4xl mb-2">📝</p>
+                            <h4 class="font-bold">あなた専用</h4>
+                            <p class="text-sm">あなたのメモや資料だけを読んでくれる</p>
+                        </div>
+                        <div class="bg-accent-light p-4 rounded-lg">
+                            <p class="text-4xl mb-2">🔐</p>
+                            <h4 class="font-bold">プライベート空間</h4>
+                            <p class="text-sm">インターネットの情報とは切り離されている</p>
+                        </div>
+                        <div class="bg-accent-light p-4 rounded-lg">
+                            <p class="text-4xl mb-2">🤖</p>
+                            <h4 class="font-bold">対話で活用</h4>
+                            <p class="text-sm">自分の情報をもとにAIが的確に答えてくれる</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="how-to-use">
+                 <div class="card p-6 md:p-8">
+                    <h3 class="text-2xl font-bold text-center mb-8">NotebookLMは、3ステップで始められる</h3>
+                    <div class="relative flex flex-col items-center space-y-8">
+                        <div class="relative w-full max-w-sm p-4 text-center rounded-lg shadow-md flow-step flow-connector">
+                            <span class="absolute -top-4 -left-4 bg-highlight-blue text-white rounded-full h-8 w-8 flex items-center justify-center font-bold">1</span>
+                            <h4 class="font-bold text-lg">情報をためる</h4>
+                            <p class="text-sm">Googleドキュメントなどにメモを蓄積（形式自由）</p>
+                        </div>
+                        <div class="relative w-full max-w-sm p-4 text-center rounded-lg shadow-md flow-step flow-connector">
+                            <span class="absolute -top-4 -left-4 bg-highlight-blue text-white rounded-full h-8 w-8 flex items-center justify-center font-bold">2</span>
+                            <h4 class="font-bold text-lg">読み込ませる</h4>
+                            <p class="text-sm">作成したドキュメントをNotebookLMにアップロード</p>
+                        </div>
+                        <div class="relative w-full max-w-sm p-4 text-center rounded-lg shadow-md flow-step">
+                            <span class="absolute -top-4 -left-4 bg-highlight-blue text-white rounded-full h-8 w-8 flex items-center justify-center font-bold">3</span>
+                            <h4 class="font-bold text-lg">聞いてみる</h4>
+                            <p class="text-sm">「この記事の改善点は？」など具体的に質問</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="workflow">
+                <div class="card p-6 md:p-8">
+                    <h3 class="text-2xl font-bold text-center mb-2">最強の合わせ技：NotebookLM × ChatGPT</h3>
+                    <p class="text-center text-gray-600 mb-8">2つのAIの得意なことを組み合わせることで、執筆プロセスが劇的に変わります。</p>
+                    <div class="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-0">
+                        <div class="flex-1 text-center p-4">
+                            <p class="text-6xl mb-2">👤</p>
+                            <h4 class="font-bold text-lg highlight-blue">NotebookLM</h4>
+                            <p class="text-sm mt-1">あなたの一次情報から<br/>「記事の核」を作る</p>
+                            <ul class="text-xs text-left list-disc list-inside mt-2 text-gray-600">
+                                <li>アイデア出し</li>
+                                <li>論点の整理</li>
+                                <li>独自データの抽出</li>
+                            </ul>
+                        </div>
+                        <div class="text-4xl text-highlight-yellow mx-4 my-4 md:my-0">→</div>
+                        <div class="flex-1 text-center bg-gray-100 p-4 rounded-lg">
+                             <p class="text-4xl mb-2">📝</p>
+                             <h4 class="font-bold text-lg">中身のある草稿</h4>
+                             <p class="text-sm mt-1">深みと独自性のある<br/>コンテンツの原型</p>
+                        </div>
+                        <div class="text-4xl text-highlight-yellow mx-4 my-4 md:my-0">→</div>
+                         <div class="flex-1 text-center p-4">
+                             <p class="text-6xl mb-2">🌍</p>
+                             <h4 class="font-bold text-lg highlight-green">ChatGPT</h4>
+                             <p class="text-sm mt-1">草稿を受け取り<br/>「記事の形」を整える</p>
+                             <ul class="text-xs text-left list-disc list-inside mt-2 text-gray-600">
+                                 <li>文章をリライト</li>
+                                 <li>初心者向けに調整</li>
+                                 <li>構成案を作成</li>
+                             </ul>
+                        </div>
+                    </div>
+                    <div class="mt-8 p-4 bg-green-50 rounded-lg text-center">
+                        <p class="font-bold text-lg highlight-green">これが今のところ一番、実用的で現実的な生成AIの使い方です。</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="conclusion">
+                <div class="bg-cover bg-center rounded-lg p-8 md:p-12 text-center" style="background-color: #073B4C;">
+                    <h3 class="text-2xl md:text-3xl font-bold text-white mb-4">AI時代こそ、「自分だけの視点」が武器になる</h3>
+                    <p class="text-lg text-gray-300 mb-6">AIは万能ではありません。情報を蓄積し、あなただけの編集者としてNotebookLMを使いこなしましょう。</p>
+                    <div class="bg-white/10 p-6 rounded-lg">
+                        <p class="text-xl md:text-2xl font-bold text-white">「自分の考えや経験を、<br/>もう一度使える形で残しておく」</p>
+                        <p class="mt-3 text-gray-200">これが、AI時代に埋もれないための新しい習慣です。</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="text-center mt-12 text-gray-500 text-sm">
+            <p>&copy; 2025 Infographic. All rights reserved.</p>
+        </footer>
+    </div>
+
+<script>
+    function wrapLabel(str, maxWidth) {
+        if (str.length <= maxWidth) {
+            return str;
+        }
+        const words = str.split('');
+        const lines = [];
+        let currentLine = '';
+        words.forEach(word => {
+            if ((currentLine + word).length > maxWidth) {
+                lines.push(currentLine);
+                currentLine = word;
+            } else {
+                currentLine += word;
+            }
+        });
+        lines.push(currentLine);
+        return lines;
+    }
+
+    const chartTooltipConfig = {
+        plugins: {
+            tooltip: {
+                callbacks: {
+                    title: function(tooltipItems) {
+                        const item = tooltipItems[0];
+                        let label = item.chart.data.labels[item.dataIndex];
+                        if (Array.isArray(label)) {
+                          return label.join('');
+                        } else {
+                          return label;
+                        }
+                    }
+                }
+            }
+        }
+    };
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const problemCtx = document.getElementById('problemChart');
+        if (problemCtx) {
+            new Chart(problemCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['一般的で深みがないと感じる', 'ユニークで価値があると感じる'],
+                    datasets: [{
+                        label: 'ChatGPT生成コンテンツへの感想',
+                        data: [78, 22],
+                        backgroundColor: [
+                            '#FF6B6B',
+                            '#06D6A0',
+                        ],
+                        borderColor: '#F7F9FB',
+                        borderWidth: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                font: {
+                                    family: "'Noto Sans JP', sans-serif"
+                                }
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: '生成AIコンテンツに対するユーザーの認識',
+                             font: {
+                                size: 16,
+                                family: "'Noto Sans JP', sans-serif"
+                            },
+                            color: '#073B4C'
+                        },
+                        ...chartTooltipConfig.plugins
+                    },
+                    cutout: '60%'
+                }
+            });
+        }
+    });
+</script>
+
+</body>
+</html>
